@@ -1,0 +1,162 @@
+--Add a new Cocktail with empty values
+INSERT INTO Cocktail (c_Key) VALUES ((SELECT MAX(c_Key) From Cocktail) + 1);
+INSERT INTO Creator (cr_Key) VALUES ((SELECT MAX(cr_Key) From Creator) + 1);
+INSERT INTO Garnish (gr_Key) VALUES ((SELECT MAX(gr_Key) From Garnish) + 1);
+INSERT INTO Glassware (g_Key) VALUES ((SELECT MAX(g_Key) From Glassware) + 1);
+INSERT INTO Ingrediants (i_Key) VALUES ((SELECT MAX(i_Key) From Ingrediants) + 1);
+INSERT INTO Notes (n_Key) VALUES ((SELECT MAX(n_Key) From Notes) + 1);
+INSERT INTO Preparation (p_Key) VALUES ((SELECT MAX(p_Key) From Preparation) + 1);
+
+--Show Cocktails and all their information
+SELECT *
+FROM Cocktail, Creator, Garnish, Glassware, Ingrediants, Notes, Preparation
+WHERE Cocktail.c_Key = Creator.cr_Key 
+    AND Cocktail.c_Key = Garnish.gr_Key 
+    AND Cocktail.c_Key = Glassware.g_Key 
+    AND Cocktail.c_Key = Ingrediants.i_Key 
+    AND Cocktail.c_Key = Notes.n_Key 
+    AND Cocktail.c_Key = Preparation.p_Key;
+
+--Delete Function
+--Delete a Cocktail, the value of ?_Key will be determined by the user
+DELETE FROM Cocktail WHERE c_Key = 21;
+DELETE FROM Creator WHERE cr_Key = 21;
+DELETE FROM Garnish WHERE gr_Key = 21;
+DELETE FROM Glassware WHERE g_Key = 21;
+DELETE FROM Ingrediants WHERE i_Key = 21;
+DELETE FROM Notes WHERE n_Key = 21;
+DELETE FROM Preparation WHERE p_Key = 21;
+
+--Update Function
+--Update a Cocktail, in this case we are updateing the new entry we created earlier
+UPDATE Cocktail
+SET c_Name = 'The Bomber', c_Price = '$6.99', c_Verification = 'Yes'
+WHERE c_Key = 21;
+UPDATE Creator
+SET cr_Bartender = 'Michael Issa', cr_Bar = 'Club Merced', cr_Location = 'Merced'
+WHERE cr_Key = 21;
+UPDATE Garnish
+SET gr_Item = 'Mint Leaf', gr_type = 'Sprig', gr_quantity = 'One Whole Sprig'
+WHERE gr_Key = 21;
+UPDATE Glassware
+SET g_Size = '10 oz', g_Type = 'Collins', g_Manufacturer = 'Alex''s Glassware'
+WHERE g_Key = 21;
+UPDATE Ingrediants
+SET i_Type = '1800 Tequila Silver, Lime Juice, Orange Juice, Sugar', i_Quantity = '4 oz 1800 Tequila Silver, 1 oz Lime Juice, 1 oz Orange Juice, 2 tpbs Sugar'
+WHERE i_Key = 21;
+UPDATE Notes
+SET n_Note = '2 Drink Limit', n_Author = 'Michael Issa', n_Date = '11/9/2020'
+WHERE n_Key = 21;
+UPDATE Preparation
+SET p_Recipe = 'Mix all ingrediants into glass and top with ice, serve with a straw', p_Time = '2 min', p_Tools = 'Mixing spoon'
+WHERE p_Key = 21;
+
+
+--Search Functions
+--Search by Name
+SELECT * 
+FROM Cocktail, Creator, Garnish, Glassware, Ingrediants, Notes, Preparation
+WHERE c_name = 'Flor de Amaras'
+    AND Cocktail.c_Key = Creator.cr_Key 
+    AND Cocktail.c_Key = Garnish.gr_Key 
+    AND Cocktail.c_Key = Glassware.g_Key 
+    AND Cocktail.c_Key = Ingrediants.i_Key 
+    AND Cocktail.c_Key = Notes.n_Key 
+    AND Cocktail.c_Key = Preparation.p_Key;
+
+--Search by Bartender
+SELECT * 
+FROM Cocktail, Creator, Garnish, Glassware, Ingrediants, Notes, Preparation
+WHERE cr_Bartender = 'Caterina Miltenberger'
+    AND Cocktail.c_Key = Creator.cr_Key 
+    AND Cocktail.c_Key = Garnish.gr_Key 
+    AND Cocktail.c_Key = Glassware.g_Key 
+    AND Cocktail.c_Key = Ingrediants.i_Key 
+    AND Cocktail.c_Key = Notes.n_Key 
+    AND Cocktail.c_Key = Preparation.p_Key;
+
+--Search by Bar
+SELECT * 
+FROM Cocktail, Creator, Garnish, Glassware, Ingrediants, Notes, Preparation
+WHERE cr_Bar = 'Backbar'
+    AND Cocktail.c_Key = Creator.cr_Key 
+    AND Cocktail.c_Key = Garnish.gr_Key 
+    AND Cocktail.c_Key = Glassware.g_Key 
+    AND Cocktail.c_Key = Ingrediants.i_Key 
+    AND Cocktail.c_Key = Notes.n_Key 
+    AND Cocktail.c_Key = Preparation.p_Key;
+
+--Search by Location
+SELECT * 
+FROM Cocktail, Creator, Garnish, Glassware, Ingrediants, Notes, Preparation
+WHERE cr_Location = 'San Francisco'
+    AND Cocktail.c_Key = Creator.cr_Key 
+    AND Cocktail.c_Key = Garnish.gr_Key 
+    AND Cocktail.c_Key = Glassware.g_Key 
+    AND Cocktail.c_Key = Ingrediants.i_Key 
+    AND Cocktail.c_Key = Notes.n_Key
+    AND Cocktail.c_Key = Preparation.p_Key;
+
+--Search by Glassware
+SELECT *
+FROM Cocktail, Creator, Garnish, Glassware, Ingrediants, Notes, Preparation
+WHERE g_Type = 'Nick & Nora'
+    AND Cocktail.c_Key = Creator.cr_Key 
+    AND Cocktail.c_Key = Garnish.gr_Key 
+    AND Cocktail.c_Key = Glassware.g_Key 
+    AND Cocktail.c_Key = Ingrediants.i_Key 
+    AND Cocktail.c_Key = Notes.n_Key 
+    AND Cocktail.c_Key = Preparation.p_Key;
+
+
+--App Functionality (How the User will interact)
+--This will be the first list presented to the user. User will be able to click on a Name to see more information
+SELECT c_Name AS "Name"
+FROM Cocktail;
+
+--After user selects a Cocktail it will show them all the corresponding information for that cocktail
+SELECT 
+    c_Name AS "Name", 
+    c_Price AS "Price", 
+    c_Verification AS "Approved", 
+    g_Type AS "Glass", 
+    p_Tools AS "Tools", 
+    i_Type AS "Ingrediants", 
+    i_Quantity AS "Mesurments", 
+    p_Recipe AS "Recipe", 
+    gr_Item AS "Garnish", 
+    gr_type AS "Type of Garnish", 
+    gr_Quantity AS "Garnish Mesurment"
+FROM Cocktail, Creator, Garnish, Glassware, Ingrediants, Notes, Preparation
+WHERE c_name = 'The Bomber'
+    AND Cocktail.c_Key = Creator.cr_Key
+    AND Cocktail.c_Key = Garnish.gr_Key 
+    AND Cocktail.c_Key = Glassware.g_Key
+    AND Cocktail.c_Key = Ingrediants.i_Key 
+    AND Cocktail.c_Key = Notes.n_Key
+    AND Cocktail.c_Key = Preparation.p_Key;
+    
+--The user will have a "More Info" button they can click which will show them all additional information for that cocktail
+SELECT 
+    c_Name AS "Name", 
+    cr_Bartender AS "Bartender", 
+    cr_Bar AS "Bar", 
+    cr_Location AS "Location", 
+    g_Size AS "Glass Size", 
+    g_Manufacturer AS "Glass Manufacturer", 
+    i_Substitution AS "Substitutions", 
+    p_Time AS "Time To Make"
+FROM Cocktail, Creator, Garnish, Glassware, Ingrediants, Notes, Preparation
+WHERE  c_name = 'The Bomber'
+    AND Cocktail.c_Key = Creator.cr_Key 
+    AND Cocktail.c_Key = Garnish.gr_Key 
+    AND Cocktail.c_Key = Glassware.g_Key 
+    AND Cocktail.c_Key = Ingrediants.i_Key 
+    AND Cocktail.c_Key = Notes.n_Key 
+    AND Cocktail.c_Key = Preparation.p_Key;
+
+--The user will have a "Notes" button they can click which will show them and notes about the cocktail
+SELECT n_Note AS "Notes", n_Author AS "Author", n_Date AS "Date"
+FROM Cocktail, Notes
+WHERE c_name = 'The Bomber' 
+    AND Cocktail.c_Key = Notes.n_Key;
