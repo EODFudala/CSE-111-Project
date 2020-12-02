@@ -1,0 +1,204 @@
+--Add New Customer
+--This will take in essential information
+--Employee will fill out everything except the CustomerId
+INSERT INTO customers (CustomerId, FirstName, LastName, Address, City, State, Country, PostalCode, Phone, Email) 
+    VALUES (
+    (SELECT MAX(CustomerId) FROM customers) + 1, 
+    'Alex', 
+    'F', 
+    '123 Street', 
+    'Merced', 
+    'CA', 
+    'USA',
+    '12345',
+    '123 456-7890', 
+    'email@gmail.com');
+
+--Edit Customer Info
+--Edit existing info and add new
+--Employee will be asked the first and last name of the desired user before update
+UPDATE customers
+SET Company = 'UC Merced', Address = '123 Street', City = 'Merced', State = 'CA', Country = 'USA', PostalCode = '12345', Phone = '(123) 456-7890', Fax = '+1 (123) 098-7654', Email = 'email@gmail.com', SupportRepId = '3'
+WHERE FirstName = 'Alex' AND LastName = 'F';
+
+--Delete Customer
+--Employee will be asked the first and last name of the desired user before delete
+DELETE FROM customers
+WHERE FirstName = 'Alex' AND LastName = 'F';
+
+--Add New Invoice
+--Employee will bbe asked to enter the first and last name of the customer before. They will also be asked the track name they wish to add
+INSERT INTO invoices (InvoiceId, CustomerId, InvoiceDate, BillingAddress, BillingCity, BillingState, BillingCountry, BillingPostalCode, Total)
+    VALUES (
+        (SELECT MAX(InvoiceId) FROM invoices) + 1, 
+        (SELECT CustomerId FROM customers WHERE FirstName = 'Alex' AND LastName = 'F'), 
+        (DATE('now')), 
+        (SELECT Address FROM customers WHERE FirstName = 'Alex' AND LastName = 'F'), 
+        (SELECT City FROM customers WHERE FirstName = 'Alex' AND LastName = 'F'), 
+        (SELECT State FROM customers WHERE FirstName = 'Alex' AND LastName = 'F'), 
+        (SELECT Country FROM customers WHERE FirstName = 'Alex' AND LastName = 'F'), 
+        (SELECT PostalCode FROM customers WHERE FirstName = 'Alex' AND LastName = 'F'), 
+        '0.99');
+INSERT INTO invoice_items (InvoiceLineId, InvoiceId, TrackId, UnitPrice, Quantity) 
+    VALUES (
+    (SELECT MAX(InvoiceLineId) FROM invoice_items) + 1, 
+    (SELECT InvoiceId FROM invoices INNER JOIN customers ON customers.CustomerId = invoices.CustomerId WHERE FirstName = 'Alex' AND LastName = 'F'),
+    (SELECT TrackId FROM tracks WHERE Name = 'Let There Be Rock'),
+    '0.99',
+    '1');
+    
+--Edit Invoice
+--Employee will be asked the track name before. Employee will also need to know the InvoiceId
+UPDATE invoice_items
+SET TrackId = (SELECT TrackId FROM tracks WHERE Name = 'Let There Be Rock')
+WHERE InvoiceId = '2241';
+
+--Delete Invoice
+--Employee will need to enter the InvoiceId
+DELETE FROM invoice_items
+WHERE InvoiceId = '413';
+DELETE FROM invoices
+WHERE InvoiceId = '413';
+
+--Add Artist
+--Employee will enter the name of the new artist
+INSERT INTO artist (ArtistId, Name)
+    VALUES (
+    (SELECT MAX(ArtistId) FROM artist) + 1,
+    'Ed Sheeran');
+
+--Add Album
+--Employee will enter the name of the album as well as the artist the album belongs to
+INSERT INTO albums (AlbumId, Title, ArtistId)
+    VALUES (
+    (SELECT MAX(AlbumId) FROM albums) + 1,
+    '+',
+    (SELECT ArtistId FROM artists WHERE Name = 'Ed Sheeran'));
+    
+--Add Track
+--Employee will enter the name of the track, artist, and genre for the song
+INSERT INTO tracks (TrackId, Name, AlbumId, GenreId, UnitPrice)
+    VALUES(
+    (SELECT MAX(TrackId) FROM tracks) + 1,
+    'The A Team',
+    (SELECT AlbumId FROM albums WHERE ArtistId = (SELECT ArtistId FROM artists WHERE Name = 'Ed Sheeran')),
+    (SELECT GenreId FROM genres WHERE Name = 'Pop'),
+    '0.99');
+
+--Add Genre
+--Employee will enter the name of the genre to be added
+INSERT INTO genres (GenreId, Name)
+    VALUES (
+    (SELECT MAX(GenreId) FROM genres) + 1,
+    'Folk');
+
+--Edit Artist
+--Employee will need to know the ArtistId
+UPDATE artists
+SET Name = 'Ed Sheeran'
+WHERE ArtistId = '276';
+
+--Edit Album
+--Employee will need to know the AlbumId
+UPDATE albums
+SET Title = 'x'
+WHERE AlbumId = '348';
+
+--Edit Track
+--Employee will need to know the TrackId
+UPDATE tracks
+SET Name = 'Photograph', MediaTypeId = '2', Composer = 'Ed Sheeran', Milliseconds = '317462', Bytes = '4183729', UnitPrice = '0.99'
+WHERE TrackId = '3504';
+
+--Edit Genre
+--Employee will need to know the GenreId
+UPDATE genres
+SET Name = 'Gospel'
+WHERE GenreId = '26';
+
+--Search for band albums and there store locations
+--Employee will enter the artists name
+SELECT Title AS Album, stores.Name, stores.StoreLoc
+FROM albums
+INNER JOIN artists 
+    ON artists.ArtistId = albums.ArtistId
+INNER JOIN store_album
+    ON store_album.AlbumId = albums.AlbumId
+INNER JOIN stores
+    ON stores.StoreId = store_album.StoreId
+WHERE artists.Name = 'AC/DC'
+ORDER BY Album;
+
+--Search for tracks by a band
+--Employee will enter the artists name
+SELECT Name AS Song, Title AS Album
+FROM tracks
+INNER JOIN albums 
+    ON tracks.AlbumId = albums.AlbumId
+INNER JOIN artists 
+    ON artists.ArtistId = albums.ArtistId
+WHERE artists.Name = 'AC/DC'
+ORDER BY Album;
+
+--Search for customers orders
+--Employee will enter the customers first and last name
+--Main use is to obtain the InvoiceId for a customers order to be used later
+SELECT InvoiceId, FirstName, LastName, InvoiceDate, Total
+FROM customers
+INNER JOIN invoices
+    ON invoices.CustomerId = customers.CustomerId
+INNER JOIN invoice_items
+    ON invoice_items.InvoiceId = invoices.InvoiceId
+INNER JOIN tracks
+    ON tracks.TrackId = invoice_items.TrackId
+WHERE FirstName = 'Eduardo' AND LastName = 'Martins'
+GROUP BY invoices.InvoiceId
+ORDER BY InvoiceDate DESC;
+
+--Search for a playlist
+--Employee will enter the name of the playlist
+SELECT tracks.Name AS Songs
+FROM playlists
+INNER JOIN playlist_track
+    ON playlist_track.PlaylistId = playlists.PlaylistId
+INNER JOIN tracks
+    ON tracks.TrackId = playlist_track.TrackId
+WHERE playlists.Name = 'Heavy Metal Classic'
+ORDER BY tracks.Name;
+
+--Search for songs under a genre
+--Employee will enter the name of the genre
+SELECT genres.Name AS Genre, tracks.Name
+FROM genres
+INNER JOIN tracks
+    ON tracks.GenreId = genres.GenreId
+WHERE Genre = 'Rock'
+ORDER BY tracks.Name;
+
+--Search for an Artist
+--Employee will enter the name of the artist
+--Used to obtain the ArtistId for later use
+SELECT ArtistId, Name
+FROM artists
+WHERE Name = 'Green Day';
+
+--Search for an album
+--Employee will enter the name of the album
+--Used to obain the AlbumId for later use
+SELECT AlbumId, Title
+FROM albums
+WHERE Title = 'Audioslave';
+
+--Search for a track
+--Employee will enter the name of the track
+--Used to obain the TrackId for later use
+SELECT TrackId, Name
+FROM tracks
+WHERE Name = 'Let There Be Rock';
+
+--Search for an genre
+--Employee will enter the name of the genre
+--Used to obain the GenreId for later use
+SELECT GenreId, Name
+FROM genres
+WHERE Name = 'Pop';
